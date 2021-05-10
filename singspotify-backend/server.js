@@ -1,10 +1,16 @@
 const express = require('express');
-const spotifyWebAPI = require('spotify-web-api-node'); 
+const cors = require("cors")
+const bodyParser = require("body-parser")
+const SpotifyWebAPI = require('spotify-web-api-node');
+
 const app = express();
+app.use(cors());
+app.use(bodyParser.json())
+// app.use(bodyParser.urlencoded({ extended: true })) 
 
 app.post('/login', (req, res) => {
-    const code = req.body.code
-    const spotifyApi = new spotifyWebAPI({
+    const code = req.body.code;
+    const spotifyApi = new SpotifyWebAPI({
         // Replace with hostname for redirectUri when moved into production build.
         redirectUri: "http://localhost:3000",
         // Move into ENV file outside of test. 
@@ -15,9 +21,12 @@ app.post('/login', (req, res) => {
         res.json({
             accessToken: data.body.access_token,
             refreshToken: data.body.refresh_token,
-            expiresIn: data.body.expires_in
+            expiresIn: data.body.expires_in,
         })
-    }).catch(() => {
-        res.sendStatus(400)
+    }).catch(err => {
+        console.log(err);
+        res.sendStatus(400);
     })
 })
+
+app.listen(3001)
